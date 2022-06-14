@@ -1,0 +1,82 @@
+
+
+buildscript {
+    repositories {
+        mavenLocal()
+    }
+}
+
+plugins {
+    id 'java'
+    id 'com.bmuschko.docker-remote-api' version '7.4.0'
+}
+
+version "1.0"
+group "mySqlDockerImage"
+
+
+import com.bmuschko.gradle.docker.tasks.image.*
+
+ext {
+    dockerTag = "mysql-5.7-${dbClient}:latest"
+    dockerBuildDir = mkdir("${buildDir}/docker")
+}
+
+task dumpSchema(){
+    group = 'sql'
+
+    doLast {
+        exec {
+            workingDir './build/docker'
+            commandLine 'sh', '-c', "mysqldump -Cq -h $dumpHost -u$dumpUser -p$dumpPassword --no-data --verbose --single-transaction --order-by-primary --routines --column-statistics=0    ${dumpDatabase} > 1_initial_schema.sql"
+        }
+    }
+}
+
+
+task dumpData( dependsOn: dumpSchema){
+    group = 'sql'
+
+    doLast {
+        exec {
+            workingDir './build/docker'
+            commandLine 'sh', '-c', "mysqldump -Cq -h $dumpHost -u$dumpUser -p$dumpPassword --no-create-info --verbose --single-transaction --order-by-primary --routines --column-statistics=0  --ignore-table=${dumpDatabase}.broker_assoc_comm_log  --ignore-table=${dumpDatabase}.broker_comm_log --ignore-table=${dumpDatabase}.communication_log  --ignore-table=${dumpDatabase}.communication_log_docs  --ignore-table=${dumpDatabase}.contact_comm_log  --ignore-table=${dumpDatabase}.correspondent_assoc_comm_log  --ignore-table=${dumpDatabase}.correspondent_comm_log  --ignore-table=${dumpDatabase}.domain_table_audit_log  --ignore-table=${dumpDatabase}.dsp_loan_call_log  --ignore-table=${dumpDatabase}.fee_service_transaction_log  --ignore-table=${dumpDatabase}.home_loan_aus_log --ignore-table=${dumpDatabase}.home_loan_compliance_log  --ignore-table=${dumpDatabase}.home_loan_leg_log  --ignore-table=${dumpDatabase}.home_loan_system_error_log  --ignore-table=${dumpDatabase}.mi_quote_transaction_log  --ignore-table=${dumpDatabase}.ob_loan_services_log  --ignore-table=${dumpDatabase}.participant_communication_log  --ignore-table=${dumpDatabase}.pricing_service_transaction_log  --ignore-table=${dumpDatabase}.queue_message_log  --ignore-table=${dumpDatabase}.ref_call_log_call_purpose_type  --ignore-table=${dumpDatabase}.referal_partner_assoc_comm_log  --ignore-table=${dumpDatabase}.referal_partner_comm_log  --ignore-table=${dumpDatabase}.shuttle_log  --ignore-table=${dumpDatabase}.sys_batch_log  --ignore-table=${dumpDatabase}.sys_batch_update_log  --ignore-table=${dumpDatabase}.sys_custom_tasking_log  --ignore-table=${dumpDatabase}.sys_user_comm_log  --ignore-table=${dumpDatabase}.sys_web_service_log  --ignore-table=${dumpDatabase}.warehouse_bank_export_log  --ignore-table=${dumpDatabase}.web_service_transaction_log    ${dumpDatabase} >> 2_initial_data.sql"
+        }
+    }
+}
+
+
+task prepareDocker(type: Copy, dependsOn: dumpData) {
+    description = 'Copy docker file to build directory'
+    group = 'Docker'
+
+    from "${rootProject.projectDir}/Dockerfile"
+    from "${rootProject.projectDir}/0_initial_users.sql"
+
+    into dockerBuildDir
+}
+
+task buildImage(type: DockerBuildImage, dependsOn: prepareDocker) {
+    description = 'Create Docker image to run the Grails application'
+    group = 'Docker'
+    inputDir = file(dockerBuildDir)
+    images.add(dockerTag)
+
+    if(dockerRegistry) {
+        images.add("$dockerPrefix/$dockerTag".toString())
+    }
+}
+task pushImage(type: DockerPushImage, dependsOn: buildImage) {
+    group "docker"
+    description "Push custom docker image."
+
+
+
+    registryCredentials {
+        url = dockerRegistry
+        username = dockerUserName
+        password = dockerPassword
+    }
+
+    images.add("$dockerPrefix/$dockerTag".toString())
+}
