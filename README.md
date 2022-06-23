@@ -50,3 +50,13 @@ Or create and use aliases in your .bashrc/.bash_profile:
 alias mysql='docker-compose -f ~/g5/dockerCompose/mysql-5.7.yml up -d'
 alias kmysql='docker-compose -f ~/g5/dockerCompose/mysql-5.7.yml down'
 ```
+
+## Fixing Column_Statistics error
+If you have a newer version of `mysqldump` you may see this error:
+```shell
+mysqldump: Couldn't execute 'SELECT COLUMN_NAME,                       JSON_EXTRACT(HISTOGRAM, '$."number-of-buckets-specified"')                FROM information_schema.COLUMN_STATISTICS                WHERE SCHEMA_NAME = 'bluesage_dev' AND TABLE_NAME = 'address';': Unknown table 'COLUMN_STATISTICS' in information_schema (1109)
+```
+To fix that we have a variable for extraFlags set that to this:
+```shell
+-PextraFlags=--column-statistics=0
+```
