@@ -1,17 +1,17 @@
 version: "3.9"
 services:
   db:
-    image: ghcr.io/bluesagesolutions/mysql-5.7-bluesage:latest
+    image: 609251059722.dkr.ecr.us-east-1.amazonaws.com/mysql-5.7-bluesage_dev
     command: ['mysqld', '--sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES']
     environment:
-        MYSQL_DATABASE: 'bluesage_dev'
-        MYSQL_ROOT_PASSWORD: 'secret-pw'
-        MYSQL_ROOT_HOST: '%'
-        MYSQL_USER: 'lp_user'
-        MYSQL_PASSWORD: 'lp_user'
+      MYSQL_DATABASE: 'bluesage_dev'
+      MYSQL_ROOT_PASSWORD: 'secret-pw'
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_USER: 'lp_user'
+      MYSQL_PASSWORD: 'lp_user'
     ports:
       - '3306:3306'
     expose:
       - '3306'
     volumes:
-      - '~/.mysql-data-bluesage/db:/var/lib/mysql'
+      - '~/.mysql-data/db:/var/lib/mysql'

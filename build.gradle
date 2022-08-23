@@ -18,7 +18,7 @@ group "mySqlDockerImage"
 import com.bmuschko.gradle.docker.tasks.image.*
 
 ext {
-    dockerTag = "mysql-5.7-${dbClient}:latest"
+    dockerTag = "mysql-5.7-${dumpDatabase}:latest"
     dockerBuildDir = mkdir("${buildDir}/docker")
 }
 
@@ -80,6 +80,3 @@ task pushImage(type: DockerPushImage, dependsOn: buildImage) {
 
     images.add("$dockerPrefix/$dockerTag".toString())
 }
-
-
-//mysqldump -h bluesage-lower-cluster.cluster-c4bji9jquct6.us-east-1.rds.amazonaws.com -ubluesage_dev -pDYwQgKdb7hWkMvJm --no-create-info --skip-triggers  --verbose --single-transaction --order-by-primary --routines --column-statistics=0  --ignore-table=bluesage_dev.broker_assoc_comm_log  --ignore-table=bluesage_dev.broker_comm_log --ignore-table=bluesage_dev.communication_log  --ignore-table=bluesage_dev.communication_log_docs  --ignore-table=bluesage_dev.contact_comm_log  --ignore-table=bluesage_dev.correspondent_assoc_comm_log  --ignore-table=bluesage_dev.correspondent_comm_log  --ignore-table=bluesage_dev.domain_table_audit_log  --ignore-table=bluesage_dev.dsp_loan_call_log  --ignore-table=bluesage_dev.fee_service_transaction_log  --ignore-table=bluesage_dev.home_loan_aus_log --ignore-table=bluesage_dev.home_loan_compliance_log  --ignore-table=bluesage_dev.home_loan_leg_log  --ignore-table=bluesage_dev.home_loan_system_error_log  --ignore-table=bluesage_dev.mi_quote_transaction_log  --ignore-table=bluesage_dev.ob_loan_services_log  --ignore-table=bluesage_dev.participant_communication_log  --ignore-table=bluesage_dev.pricing_service_transaction_log  --ignore-table=bluesage_dev.queue_message_log  --ignore-table=bluesage_dev.ref_call_log_call_purpose_type  --ignore-table=bluesage_dev.referal_partner_assoc_comm_log  --ignore-table=bluesage_dev.referal_partner_comm_log  --ignore-table=bluesage_dev.shuttle_log  --ignore-table=bluesage_dev.sys_batch_log  --ignore-table=bluesage_dev.sys_batch_update_log  --ignore-table=bluesage_dev.sys_custom_tasking_log  --ignore-table=bluesage_dev.sys_user_comm_log  --ignore-table=bluesage_dev.sys_web_service_log  --ignore-table=bluesage_dev.warehouse_bank_export_log  --ignore-table=bluesage_dev.web_service_transaction_log    bluesage_dev >> 2_initial_data.sql
