@@ -28,7 +28,7 @@ task dumpSchema(){
     doLast {
         exec {
             workingDir './build/docker'
-            commandLine 'sh', '-c', "mysqldump -Cq -h $dumpHost -u$dumpUser -p$dumpPassword --no-data --single-transaction --order-by-primary --routines ${extraFlags}  ${dumpDatabase} > 1_initial_schema.sql"
+            commandLine 'sh', '-c', getSchemaCommand(1, dumpDatabase)
         }
     }
 }
@@ -40,13 +40,98 @@ task dumpData( dependsOn: dumpSchema){
     doLast {
         exec {
             workingDir './build/docker'
-            commandLine 'sh', '-c', "mysqldump -Cq -h $dumpHost -u$dumpUser -p$dumpPassword --no-create-info --skip-triggers --single-transaction --order-by-primary --routines ${extraFlags}   --ignore-table=${dumpDatabase}.broker_assoc_comm_log  --ignore-table=${dumpDatabase}.broker_comm_log --ignore-table=${dumpDatabase}.communication_log  --ignore-table=${dumpDatabase}.communication_log_docs  --ignore-table=${dumpDatabase}.contact_comm_log  --ignore-table=${dumpDatabase}.correspondent_assoc_comm_log  --ignore-table=${dumpDatabase}.correspondent_comm_log  --ignore-table=${dumpDatabase}.domain_table_audit_log  --ignore-table=${dumpDatabase}.dsp_loan_call_log  --ignore-table=${dumpDatabase}.fee_service_transaction_log  --ignore-table=${dumpDatabase}.home_loan_aus_log --ignore-table=${dumpDatabase}.home_loan_compliance_log  --ignore-table=${dumpDatabase}.home_loan_leg_log  --ignore-table=${dumpDatabase}.home_loan_system_error_log  --ignore-table=${dumpDatabase}.mi_quote_transaction_log  --ignore-table=${dumpDatabase}.ob_loan_services_log  --ignore-table=${dumpDatabase}.participant_communication_log  --ignore-table=${dumpDatabase}.pricing_service_transaction_log  --ignore-table=${dumpDatabase}.queue_message_log  --ignore-table=${dumpDatabase}.ref_call_log_call_purpose_type  --ignore-table=${dumpDatabase}.referal_partner_assoc_comm_log  --ignore-table=${dumpDatabase}.referal_partner_comm_log  --ignore-table=${dumpDatabase}.shuttle_log  --ignore-table=${dumpDatabase}.sys_batch_log  --ignore-table=${dumpDatabase}.sys_batch_update_log  --ignore-table=${dumpDatabase}.sys_custom_tasking_log  --ignore-table=${dumpDatabase}.sys_user_comm_log  --ignore-table=${dumpDatabase}.sys_web_service_log  --ignore-table=${dumpDatabase}.warehouse_bank_export_log  --ignore-table=${dumpDatabase}.web_service_transaction_log    ${dumpDatabase} >> 2_initial_data.sql"
+            commandLine 'sh', '-c', getDataCommand(2, dumpDatabase)
+        }
+    }
+}
+
+task dumpDatabases() {
+    group = 'sql'
+
+    doLast {
+        List databases = dumpDatabase.split(',')
+        List hosts = dumpHost.split(',')
+        Integer position = 1
+
+        databases.eachWithIndex { String database , Integer index->
+            File createDBScript = new File("$dockerBuildDir/${position}_create_and_use_${database}.sql")
+
+            createDBScript << """
+            CREATE DATABASE IF NOT EXISTS $database;
+        """.stripIndent()
+println getSchemaCommand(position + 1, database, hosts[index])
+            exec {
+                workingDir './build/docker'
+                commandLine 'sh', '-c', getSchemaCommand(position + 1, database, hosts[index])
+            }
+            exec {
+                workingDir './build/docker'
+                commandLine 'sh', '-c', getDataCommand(position + 2, database, hosts[index])
+            }
+
+            position += 3
         }
     }
 }
 
 
-task prepareDocker(type: Copy, dependsOn: dumpData) {
+String getSchemaCommand(Integer position, String dbname, String host){
+    """
+        mysqldump -Cq -h $host -u$dumpUser -p$dumpPassword
+        --no-data
+        --single-transaction
+        --order-by-primary
+        --column-statistics=0
+        --routines ${extraFlags}
+        -B ${dbname} > ${position}_initial_schema_${dbname}.sql
+    """.stripIndent().replace('\n', ' ')
+}
+
+String getDataCommand(Integer position, String dbname, String host){
+    """
+        mysqldump -Cq -h $host -u$dumpUser -p$dumpPassword 
+        --no-create-info
+        --skip-triggers
+        --single-transaction
+        --order-by-primary
+        --column-statistics=0
+        --routines ${extraFlags}
+        --ignore-table=${dbname}.broker_assoc_comm_log
+        --ignore-table=${dbname}.broker_comm_log
+        --ignore-table=${dbname}.communication_log
+        --ignore-table=${dbname}.communication_log_docs
+        --ignore-table=${dbname}.contact_comm_log
+        --ignore-table=${dbname}.correspondent_assoc_comm_log
+        --ignore-table=${dbname}.correspondent_comm_log
+        --ignore-table=${dbname}.domain_table_audit_log
+        --ignore-table=${dbname}.dsp_loan_call_log
+        --ignore-table=${dbname}.fee_service_transaction_log
+        --ignore-table=${dbname}.home_loan_aus_log
+        --ignore-table=${dbname}.home_loan_compliance_log
+        --ignore-table=${dbname}.home_loan_leg_log
+        --ignore-table=${dbname}.home_loan_system_error_log
+        --ignore-table=${dbname}.mi_quote_transaction_log
+        --ignore-table=${dbname}.ob_loan_services_log
+        --ignore-table=${dbname}.participant_communication_log
+        --ignore-table=${dbname}.pricing_service_transaction_log
+        --ignore-table=${dbname}.queue_message_log
+        --ignore-table=${dbname}.ref_call_log_call_purpose_type
+        --ignore-table=${dbname}.referal_partner_assoc_comm_log
+        --ignore-table=${dbname}.referal_partner_comm_log
+        --ignore-table=${dbname}.shuttle_log
+        --ignore-table=${dbname}.sys_batch_log
+        --ignore-table=${dbname}.sys_batch_update_log
+        --ignore-table=${dbname}.sys_custom_tasking_log
+        --ignore-table=${dbname}.sys_user_comm_log
+        --ignore-table=${dbname}.sys_web_service_log
+        --ignore-table=${dbname}.warehouse_bank_export_log
+        --ignore-table=${dbname}.web_service_transaction_log
+        -B ${dbname} >> ${position}_initial_data_${dbname}.sql
+    """.stripIndent().replace('\n', ' ')
+}
+
+
+task prepareDocker(type: Copy, dependsOn: dumpDatabases) {
     description = 'Copy docker file to build directory'
     group = 'Docker'
 
@@ -68,6 +153,20 @@ task buildImage(type: DockerBuildImage, dependsOn: prepareDocker) {
         images.add("$dockerPrefix/$dockerTag".toString())
     }
 }
+
+task buildImageManualSchema(type: DockerBuildImage) {
+    description = 'Create Docker image to run the Grails application'
+    group = 'Docker'
+    inputDir = file(dockerBuildDir)
+    images.add("mysql-5.7-${dockertag}:latest")
+
+    println "Building: mysql-5.7-${dockertag}:latest"
+
+    if(dockerRegistry) {
+        images.add("$dockerPrefix/mysql-5.7-${dockertag}:latest".toString())
+    }
+}
+
 task pushImage(type: DockerPushImage, dependsOn: buildImage) {
     group "docker"
     description "Push custom docker image."
@@ -81,4 +180,21 @@ task pushImage(type: DockerPushImage, dependsOn: buildImage) {
     }
 
     images.add("$dockerPrefix/$dockerTag".toString())
+}
+
+
+
+task pushImageManual(type: DockerPushImage) {
+    group "docker"
+    description "Push custom docker image."
+
+    "Pushing: $dockertag"
+
+    registryCredentials {
+        url = dockerRegistry
+        username = dockerUserName
+        password = dockerPassword
+    }
+
+    images.add("$dockerPrefix/mysql-5.7-${dockertag}:latest".toString())
 }

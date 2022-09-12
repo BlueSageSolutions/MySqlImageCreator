@@ -15,3 +15,5 @@ GRANT ALL PRIVILEGES ON *.* TO 'admin'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'prime_lowr_admin'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'seq_admin'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'west_lower_admin'@'%' IDENTIFIED BY 'waoij5oi34ejel';
+GRANT ALL PRIVILEGES ON *.* TO 'hb_dev'@'%' IDENTIFIED BY 'waoij5oi34ejel';
+GRANT ALL PRIVILEGES ON *.* TO 'kind_dev'@'%' IDENTIFIED BY 'waoij5oi34ejel';
