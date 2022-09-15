@@ -1,0 +1,10 @@
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'software.amazon.awssdk:ecr:2.15.0'
+    implementation 'software.amazon.awssdk:secretsmanager:2.15.0'
+    implementation 'software.amazon.awssdk:iam:2.15.0'
+}

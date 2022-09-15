@@ -1,8 +1,7 @@
-
-
 buildscript {
     repositories {
         mavenLocal()
+        mavenCentral()
     }
 }
 
@@ -14,15 +13,12 @@ plugins {
 version "1.0"
 group "mySqlDockerImage"
 
-
-import com.bmuschko.gradle.docker.tasks.image.*
-
 ext {
     dockerTag = "mysql-5.7-${dumpDatabase}:latest"
     dockerBuildDir = mkdir("${buildDir}/docker")
 }
 
-task dumpSchema(){
+task dumpSchema() {
     group = 'sql'
 
     doLast {
@@ -34,7 +30,7 @@ task dumpSchema(){
 }
 
 
-task dumpData( dependsOn: dumpSchema){
+task dumpData(dependsOn: dumpSchema) {
     group = 'sql'
 
     doLast {
@@ -53,13 +49,13 @@ task dumpDatabases() {
         List hosts = dumpHost.split(',')
         Integer position = 1
 
-        databases.eachWithIndex { String database , Integer index->
+        databases.eachWithIndex { String database, Integer index ->
             File createDBScript = new File("$dockerBuildDir/${position}_create_and_use_${database}.sql")
 
             createDBScript << """
             CREATE DATABASE IF NOT EXISTS $database;
         """.stripIndent()
-println getSchemaCommand(position + 1, database, hosts[index])
+            println getSchemaCommand(position + 1, database, hosts[index])
             exec {
                 workingDir './build/docker'
                 commandLine 'sh', '-c', getSchemaCommand(position + 1, database, hosts[index])
@@ -75,7 +71,7 @@ println getSchemaCommand(position + 1, database, hosts[index])
 }
 
 
-String getSchemaCommand(Integer position, String dbname, String host){
+String getSchemaCommand(Integer position, String dbname, String host) {
     """
         mysqldump -Cq -h $host -u$dumpUser -p$dumpPassword
         --no-data
@@ -87,7 +83,7 @@ String getSchemaCommand(Integer position, String dbname, String host){
     """.stripIndent().replace('\n', ' ')
 }
 
-String getDataCommand(Integer position, String dbname, String host){
+String getDataCommand(Integer position, String dbname, String host) {
     """
         mysqldump -Cq -h $host -u$dumpUser -p$dumpPassword 
         --no-create-info
@@ -131,6 +127,9 @@ String getDataCommand(Integer position, String dbname, String host){
 }
 
 
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
+
 task prepareDocker(type: Copy, dependsOn: dumpDatabases) {
     description = 'Copy docker file to build directory'
     group = 'Docker'
@@ -139,6 +138,7 @@ task prepareDocker(type: Copy, dependsOn: dumpDatabases) {
     from "${rootProject.projectDir}/0_initial_users.sql"
 
     into dockerBuildDir
+
 }
 
 task buildImage(type: DockerBuildImage, dependsOn: prepareDocker) {
@@ -149,7 +149,7 @@ task buildImage(type: DockerBuildImage, dependsOn: prepareDocker) {
 
     println "Building: $dockerTag"
 
-    if(dockerRegistry) {
+    if (dockerRegistry) {
         images.add("$dockerPrefix/$dockerTag".toString())
     }
 }
@@ -162,7 +162,7 @@ task buildImageManualSchema(type: DockerBuildImage) {
 
     println "Building: mysql-5.7-${dockertag}:latest"
 
-    if(dockerRegistry) {
+    if (dockerRegistry) {
         images.add("$dockerPrefix/mysql-5.7-${dockertag}:latest".toString())
     }
 }
@@ -183,7 +183,6 @@ task pushImage(type: DockerPushImage, dependsOn: buildImage) {
 }
 
 
-
 task pushImageManual(type: DockerPushImage) {
     group "docker"
     description "Push custom docker image."
@@ -197,4 +196,12 @@ task pushImageManual(type: DockerPushImage) {
     }
 
     images.add("$dockerPrefix/mysql-5.7-${dockertag}:latest".toString())
+}
+
+
+task testGetSecret() {
+    doLast {
+        //println new AWSEcrClient().getToken()
+        println new AWSSecretManger().getSecret("arn:aws:secretsmanager:us-east-1:609251059722:secret:bluesage-lower-db-jrjxov")
+    }
 }
