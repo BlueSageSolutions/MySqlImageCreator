@@ -14,7 +14,7 @@ version "1.0"
 group "mySqlDockerImage"
 
 ext {
-    dockerTag = "mysql-5.7-${dumpDatabase}:latest"
+    dockerTag = "mysql-5.7-${dumpDatabase}:$dockerVersion"
     dockerBuildDir = mkdir("${buildDir}/docker")
 }
 
@@ -46,23 +46,30 @@ task dumpDatabases() {
 
     doLast {
         List databases = dumpDatabase.split(',')
-        List hosts = dumpHost.split(',')
+        List hosts = dbkeys.split(',')
         Integer position = 1
+        Map dbCredentials
 
         databases.eachWithIndex { String database, Integer index ->
             File createDBScript = new File("$dockerBuildDir/${position}_create_and_use_${database}.sql")
+            dbCredentials = new AWSSecretManger().getSecret(hosts[index])
 
             createDBScript << """
             CREATE DATABASE IF NOT EXISTS $database;
         """.stripIndent()
-            println getSchemaCommand(position + 1, database, hosts[index])
+
+            println getSchemaCommand(position + 1, database, dbCredentials.host, dbCredentials.username, dbCredentials.password)
+
+
             exec {
                 workingDir './build/docker'
-                commandLine 'sh', '-c', getSchemaCommand(position + 1, database, hosts[index])
+                commandLine 'sh', '-c', getSchemaCommand(position + 1, database, dbCredentials.host, dbCredentials.username, dbCredentials.password)
             }
+
+            println getDataCommand(position + 2, database, dbCredentials.host, dbCredentials.username, dbCredentials.password)
             exec {
                 workingDir './build/docker'
-                commandLine 'sh', '-c', getDataCommand(position + 2, database, hosts[index])
+                commandLine 'sh', '-c', getDataCommand(position + 2, database, dbCredentials.host, dbCredentials.username, dbCredentials.password)
             }
 
             position += 3
@@ -71,21 +78,21 @@ task dumpDatabases() {
 }
 
 
-String getSchemaCommand(Integer position, String dbname, String host) {
+String getSchemaCommand(Integer position, String dbname, String host, String dbUserName, String dbPassword) {
     """
-        mysqldump -Cq -h $host -u$dumpUser -p$dumpPassword
+        mysqldump -Cq -h $host -u$dbUserName -p$dbPassword
         --no-data
         --single-transaction
         --order-by-primary
         --column-statistics=0
         --routines ${extraFlags}
-        -B ${dbname} > ${position}_initial_schema_${dbname}.sql
-    """.stripIndent().replace('\n', ' ')
+        -B ${dbname} > ${buildDir.path}/docker/${position}_initial_schema_${dbname}.sql
+    """.stripIndent().replace('\n', ' ').strip()
 }
 
-String getDataCommand(Integer position, String dbname, String host) {
+String getDataCommand(Integer position, String dbname, String host, String dbUserName, String dbPassword) {
     """
-        mysqldump -Cq -h $host -u$dumpUser -p$dumpPassword 
+        mysqldump -Cq -h $host -u$dbUserName -p$dbPassword 
         --no-create-info
         --skip-triggers
         --single-transaction
@@ -122,8 +129,8 @@ String getDataCommand(Integer position, String dbname, String host) {
         --ignore-table=${dbname}.sys_web_service_log
         --ignore-table=${dbname}.warehouse_bank_export_log
         --ignore-table=${dbname}.web_service_transaction_log
-        -B ${dbname} >> ${position}_initial_data_${dbname}.sql
-    """.stripIndent().replace('\n', ' ')
+        -B ${dbname} > ${buildDir.path}/docker/${position}_initial_data_${dbname}.sql
+    """.stripIndent().replace('\n', ' ').strip()
 }
 
 
@@ -158,12 +165,12 @@ task buildImageManualSchema(type: DockerBuildImage) {
     description = 'Create Docker image to run the Grails application'
     group = 'Docker'
     inputDir = file(dockerBuildDir)
-    images.add("mysql-5.7-${dockertag}:latest")
+    images.add("mysql-5.7-${dockertag}:$dockerVersion")
 
-    println "Building: mysql-5.7-${dockertag}:latest"
+    println "Building: mysql-5.7-${dockertag}:$dockerVersion"
 
     if (dockerRegistry) {
-        images.add("$dockerPrefix/mysql-5.7-${dockertag}:latest".toString())
+        images.add("$dockerPrefix/mysql-5.7-${dockertag}:$dockerVersion".toString())
     }
 }
 
@@ -173,13 +180,15 @@ task pushImage(type: DockerPushImage, dependsOn: buildImage) {
 
     "Pushing: $dockerTag"
 
-    registryCredentials {
-        url = dockerRegistry
-        username = dockerUserName
-        password = dockerPassword
-    }
+    doLast {
+        registryCredentials {
+            url = dockerRegistry
+            username = dockerUserName
+            password = new AWSEcrClient().getToken(aws)
+        }
 
-    images.add("$dockerPrefix/$dockerTag".toString())
+        images.add("$dockerPrefix/$dockerTag".toString())
+    }
 }
 
 
@@ -189,19 +198,15 @@ task pushImageManual(type: DockerPushImage) {
 
     "Pushing: $dockertag"
 
-    registryCredentials {
-        url = dockerRegistry
-        username = dockerUserName
-        password = dockerPassword
-    }
+println dockerUserName
+    println new AWSEcrClient().getToken(aws)
+        List token =  new AWSEcrClient().getToken(aws).split(':')
+        registryCredentials {
+            url = dockerRegistry
+            username = token[0]
+            password = token[1]
+        }
 
-    images.add("$dockerPrefix/mysql-5.7-${dockertag}:latest".toString())
-}
+        images.add("$dockerPrefix/mysql-5.7-${dockertag}:$dockerVersion".toString())
 
-
-task testGetSecret() {
-    doLast {
-        //println new AWSEcrClient().getToken()
-        println new AWSSecretManger().getSecret("arn:aws:secretsmanager:us-east-1:609251059722:secret:bluesage-lower-db-jrjxov")
-    }
 }

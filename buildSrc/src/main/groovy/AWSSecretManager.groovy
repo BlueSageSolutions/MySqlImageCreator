@@ -1,3 +1,4 @@
+import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider
 import software.amazon.awssdk.regions.Region
@@ -10,12 +11,21 @@ class AWSSecretManger {
     SecretsManagerClient client
 
     AWSSecretManger() {
-        client = SecretsManagerClient.builder().region(Region.AP_NORTHEAST_1).credentialsProvider(EnvironmentVariableCredentialsProvider.create()).build()
+        client = SecretsManagerClient.builder().region(Region.US_EAST_1).credentialsProvider(EnvironmentVariableCredentialsProvider.create()).build()
     }
 
-    String getSecret(String id) {
+    Map getSecret(String id) {
         GetSecretValueRequest request = GetSecretValueRequest.builder().secretId(id).build() as GetSecretValueRequest
         GetSecretValueResponse response = client.getSecretValue(request)
-        return response.secretString()
+        JsonSlurper json = new JsonSlurper()
+
+        if (response.secretString() != null) {
+              return  (Map) json.parseText(response.secretString())
+          }
+          else {
+            String secret = new String(Base64.getDecoder().decode(response.secretBinary().asByteBuffer()).array())
+              return (Map) json.parseText(secret)
+          }
+
     }
 }

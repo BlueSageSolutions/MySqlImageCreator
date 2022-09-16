@@ -12,13 +12,14 @@ class AWSEcrClient {
     EcrClient ecrClient
 
     AWSEcrClient() {
-        ecrClient = EcrClient.builder().region(Region.AP_NORTHEAST_1).credentialsProvider(EnvironmentVariableCredentialsProvider.create()).build()
+        ecrClient = EcrClient.builder().region(Region.US_EAST_1).credentialsProvider(EnvironmentVariableCredentialsProvider.create()).build()
     }
 
-    String getToken() {
-        GetAuthorizationTokenRequest request= GetAuthorizationTokenRequest.builder().registryIds().build() as GetAuthorizationTokenRequest
+    String getToken(String id) {
+        GetAuthorizationTokenRequest request= GetAuthorizationTokenRequest.builder().registryIds(id).build() as GetAuthorizationTokenRequest
         GetAuthorizationTokenResponse response = ecrClient.getAuthorizationToken(request)
-        println response.authorizationData()
+        String encodedToken = response.authorizationData().first().authorizationToken()
+        return new String(Base64.getDecoder().decode(encodedToken.bytes))
 
     }
 }
