@@ -58,7 +58,7 @@ task dumpDatabases() {
             CREATE DATABASE IF NOT EXISTS $database;
         """.stripIndent()
 
-            println getSchemaCommand(position + 1, database, dbCredentials.host, dbCredentials.username, dbCredentials.password)
+            println getSchemaCommand(position + 1, database, dbCredentials.host, '*****', '*****')
 
 
             exec {
@@ -66,7 +66,7 @@ task dumpDatabases() {
                 commandLine 'sh', '-c', getSchemaCommand(position + 1, database, dbCredentials.host, dbCredentials.username, dbCredentials.password)
             }
 
-            println getDataCommand(position + 2, database, dbCredentials.host, dbCredentials.username, dbCredentials.password)
+            println getDataCommand(position + 2, database, dbCredentials.host, '*****', '*****')
             exec {
                 workingDir './build/docker'
                 commandLine 'sh', '-c', getDataCommand(position + 2, database, dbCredentials.host, dbCredentials.username, dbCredentials.password)
@@ -198,15 +198,13 @@ task pushImageManual(type: DockerPushImage) {
 
     "Pushing: $dockertag"
 
-println dockerUserName
-    println new AWSEcrClient().getToken(aws)
-        List token =  new AWSEcrClient().getToken(aws).split(':')
-        registryCredentials {
-            url = dockerRegistry
-            username = token[0]
-            password = token[1]
-        }
+    List token = new AWSEcrClient().getToken(aws).split(':')
+    registryCredentials {
+        url = dockerRegistry
+        username = token[0]
+        password = token[1]
+    }
 
-        images.add("$dockerPrefix/mysql-5.7-${dockertag}:$dockerVersion".toString())
+    images.add("$dockerPrefix/mysql-5.7-${dockertag}:$dockerVersion".toString())
 
 }
