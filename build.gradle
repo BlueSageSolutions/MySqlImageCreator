@@ -85,7 +85,7 @@ String getSchemaCommand(Integer position, String dbname, String host, String dbU
         --single-transaction
         --order-by-primary
         --column-statistics=0
-        --routines ${extraFlags}
+        --routines
         -B ${dbname} > ${buildDir.path}/docker/${position}_initial_schema_${dbname}.sql
     """.stripIndent().replace('\n', ' ').strip()
 }
@@ -98,7 +98,7 @@ String getDataCommand(Integer position, String dbname, String host, String dbUse
         --single-transaction
         --order-by-primary
         --column-statistics=0
-        --routines ${extraFlags}
+        --routines 
         --ignore-table=${dbname}.broker_assoc_comm_log
         --ignore-table=${dbname}.broker_comm_log
         --ignore-table=${dbname}.communication_log
