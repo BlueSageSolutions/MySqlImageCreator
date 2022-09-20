@@ -180,15 +180,17 @@ task pushImage(type: DockerPushImage, dependsOn: buildImage) {
 
     "Pushing: $dockerTag"
 
-    doLast {
-        registryCredentials {
-            url = dockerRegistry
-            username = dockerUserName
-            password = new AWSEcrClient().getToken(aws)
-        }
 
-        images.add("$dockerPrefix/$dockerTag".toString())
+    List token = new AWSEcrClient().getToken(aws).split(':')
+
+    registryCredentials {
+        url = dockerRegistry
+        username = token[0]
+        password = token[1]
     }
+
+    images.add("$dockerPrefix/$dockerTag".toString())
+
 }
 
 
@@ -199,6 +201,7 @@ task pushImageManual(type: DockerPushImage) {
     "Pushing: $dockertag"
 
     List token = new AWSEcrClient().getToken(aws).split(':')
+
     registryCredentials {
         url = dockerRegistry
         username = token[0]
