@@ -1,5 +1,6 @@
 import groovy.transform.CompileStatic
-import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.ecr.EcrClient
 import software.amazon.awssdk.services.ecr.model.GetAuthorizationTokenRequest
@@ -11,8 +12,9 @@ class AWSEcrClient {
     SecretsManagerClient secretsClient
     EcrClient ecrClient
 
-    AWSEcrClient() {
-        ecrClient = EcrClient.builder().region(Region.US_EAST_1).credentialsProvider(EnvironmentVariableCredentialsProvider.create()).build()
+    AWSEcrClient(String id, String key) {
+        AwsBasicCredentials credentials = AwsBasicCredentials.create(id,key)
+        ecrClient = EcrClient.builder().region(Region.US_EAST_1).credentialsProvider(StaticCredentialsProvider.create(credentials)).build()
     }
 
     String getToken(String id) {

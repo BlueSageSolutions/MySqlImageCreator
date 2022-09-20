@@ -181,7 +181,7 @@ task pushImage(type: DockerPushImage, dependsOn: buildImage) {
     "Pushing: $dockerTag"
 
 
-    List token = new AWSEcrClient().getToken(aws).split(':')
+    List token = new AWSEcrClient(awsId, awsKey).getToken(aws).split(':')
 
     registryCredentials {
         url = dockerRegistry
@@ -200,7 +200,7 @@ task pushImageManual(type: DockerPushImage) {
 
     "Pushing: $dockertag"
 
-    List token = new AWSEcrClient().getToken(aws).split(':')
+    List token = new AWSEcrClient(awsId, awsKey).getToken(aws).split(':')
 
     registryCredentials {
         url = dockerRegistry
