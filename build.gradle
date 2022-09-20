@@ -80,7 +80,7 @@ task dumpDatabases() {
 
 String getSchemaCommand(Integer position, String dbname, String host, String dbUserName, String dbPassword) {
     """
-        mysqldump -Cq -h $host -u$dbUserName -p$dbPassword
+        mysqldump -Cq -h $host -u"$dbUserName" -p"$dbPassword"
         --no-data
         --single-transaction
         --order-by-primary
@@ -92,7 +92,7 @@ String getSchemaCommand(Integer position, String dbname, String host, String dbU
 
 String getDataCommand(Integer position, String dbname, String host, String dbUserName, String dbPassword) {
     """
-        mysqldump -Cq -h $host -u$dbUserName -p$dbPassword 
+        mysqldump -Cq -h $host -u"$dbUserName" -p"$dbPassword"
         --no-create-info
         --skip-triggers
         --single-transaction
