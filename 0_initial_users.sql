@@ -21,3 +21,6 @@ GRANT ALL PRIVILEGES ON *.* TO 'westerra_ro_user'@'%' IDENTIFIED BY 'waoij5oi34e
 GRANT ALL PRIVILEGES ON *.* TO 'hb_dev'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'hb_dev_admin'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'kind_dev'@'%' IDENTIFIED BY 'waoij5oi34ejel';
+GRANT ALL PRIVILEGES ON *.* TO 'mfm_dev'@'%' IDENTIFIED BY 'waoij5oi34ejel';
+GRANT ALL PRIVILEGES ON *.* TO 'mm_lower_admin'@'%' IDENTIFIED BY 'waoij5oi34ejel';
+GRANT ALL PRIVILEGES ON *.* TO 'movement_dev'@'%' IDENTIFIED BY 'waoij5oi34ejel';
