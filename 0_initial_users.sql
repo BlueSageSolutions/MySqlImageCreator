@@ -1,4 +1,4 @@
-GRANT ALL PRIVILEGES ON *.* TO 'lp_user'@'%' IDENTIFIED BY 'waoij5oi34ejel';
+GRANT ALL PRIVILEGES ON *.* TO 'lp_user'@'%' IDENTIFIED BY 'lp_user';
 GRANT ALL PRIVILEGES ON *.* TO 'bss_developers'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'bluesage'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'bssadmin'@'%' IDENTIFIED BY 'waoij5oi34ejel';
