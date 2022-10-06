@@ -142,7 +142,7 @@ task prepareDocker(type: Copy, dependsOn: dumpDatabases) {
     group = 'Docker'
 
     from "${rootProject.projectDir}/Dockerfile"
-    from "${rootProject.projectDir}/0_initial_users.sql"
+    from "${rootProject.projectDir}/1_initial_users.sql"
 
     into dockerBuildDir
 
