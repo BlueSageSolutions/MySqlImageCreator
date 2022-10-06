@@ -1,5 +1,5 @@
-CREATE USER 'lp_user'@'%' IDENTIFIED BY 'lp_user' WITH GRANT OPTION;
-GRANT ALL PRIVILEGES ON *.* TO 'lp_user'@'%';
+CREATE USER 'lp_user'@'%' IDENTIFIED BY 'lp_user' ;
+GRANT ALL PRIVILEGES ON *.* TO 'lp_user'@'%' WITH GRANT OPTION;
 CREATE USER 'bss_developers'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'bss_developers'@'%';
 CREATE USER 'bluesage'@'%' IDENTIFIED BY 'waoij5oi34ejel';
