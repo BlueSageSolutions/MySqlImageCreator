@@ -51,7 +51,7 @@ task dumpDatabases() {
         Map dbCredentials
 
         databases.eachWithIndex { String database, Integer index ->
-            File createDBScript = new File("$dockerBuildDir/${position}_create_and_use_${database}.sql")
+            File createDBScript = new File("$dockerBuildDir/${position-1}_create_and_use_${database}.sql")
             dbCredentials = new AWSSecretManger().getSecret(hosts[index])
 
             createDBScript << """
