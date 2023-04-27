@@ -143,6 +143,7 @@ String getDataCommand(Integer position, String dbname, String host, String dbUse
 
 
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
 
 task prepareDocker(type: Copy, dependsOn: dumpDatabases) {
     description = 'Copy docker file to build directory'
