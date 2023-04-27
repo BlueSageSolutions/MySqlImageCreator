@@ -14,7 +14,14 @@ version "1.0"
 group "mySqlDockerImage"
 
 ext {
-    dockerTag = "mysql-5.7-${dumpDatabase}:$dockerVersion"
+    if(Boolean.parseBoolean(mysql8)) {
+        dockerTag = "mysql-8-${dumpDatabase}:$dockerVersion"
+        mysqlVersion = "mysql-8"
+    }else{
+        dockerTag = "mysql-5.7-${dumpDatabase}:$dockerVersion"
+        mysqlVersion = "mysql-5.7"
+    }
+
     dockerBuildDir = mkdir("${buildDir}/docker")
 }
 
@@ -134,14 +141,19 @@ String getDataCommand(Integer position, String dbname, String host, String dbUse
 }
 
 
+
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
-import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
 
 task prepareDocker(type: Copy, dependsOn: dumpDatabases) {
     description = 'Copy docker file to build directory'
     group = 'Docker'
 
-    from "${rootProject.projectDir}/Dockerfile"
+    if(Boolean.parseBoolean(mysql8)){
+        from "${rootProject.projectDir}/mysql-8/Dockerfile"
+    } else {
+        from "${rootProject.projectDir}/mysql-5_7/Dockerfile"
+    }
+
     from "${rootProject.projectDir}/1_initial_users.sql"
 
     into dockerBuildDir
@@ -165,12 +177,12 @@ task buildImageManualSchema(type: DockerBuildImage) {
     description = 'Create Docker image to run the Grails application'
     group = 'Docker'
     inputDir = file(dockerBuildDir)
-    images.add("mysql-5.7-${dockertag}:$dockerVersion")
+    images.add("$mysqlVersion-${dockertag}:$dockerVersion")
 
-    println "Building: mysql-5.7-${dockertag}:$dockerVersion"
+    println "Building: $mysqlVersion-${dockertag}:$dockerVersion"
 
     if (dockerRegistry) {
-        images.add("$dockerPrefix/mysql-5.7-${dockertag}:$dockerVersion".toString())
+        images.add("$dockerPrefix/$mysqlVersion-${dockertag}:$dockerVersion".toString())
     }
 }
 
@@ -208,6 +220,6 @@ task pushImageManual(type: DockerPushImage) {
         password = token[1]
     }
 
-    images.add("$dockerPrefix/mysql-5.7-${dockertag}:$dockerVersion".toString())
+    images.add("$dockerPrefix/$mysqlVersion-${dockertag}:$dockerVersion".toString())
 
 }
