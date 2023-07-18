@@ -79,6 +79,8 @@ task dumpDatabases() {
                 commandLine 'sh', '-c', getDataCommand(position + 2, database, dbCredentials.host, dbCredentials.username, dbCredentials.password)
             }
 
+            createDBScript.append("\nSET GLOBAL log_bin_trust_function_creators = 0;")
+
             position += 3
         }
     }
