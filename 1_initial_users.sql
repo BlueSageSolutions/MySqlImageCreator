@@ -58,6 +58,8 @@ CREATE USER 'scu_lower_admin'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'scu_lower_admin'@'%';
 CREATE USER 'scu_admin'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'scu_admin'@'%';
+CREATE USER 'bssservicing_dev'@'%' IDENTIFIED BY 'waoij5oi34ejel';
+GRANT ALL PRIVILEGES ON *.* TO 'scu_admin'@'%';
 FLUSH PRIVILEGES;
 
 SET GLOBAL log_bin_trust_function_creators = 1;
