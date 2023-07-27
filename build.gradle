@@ -153,8 +153,10 @@ task prepareDocker(type: Copy, dependsOn: dumpDatabases) {
 
     if(Boolean.parseBoolean(mysql8)){
         from "${rootProject.projectDir}/mysql-8/Dockerfile"
+        from "${rootProject.projectDir}/mysql-8/my.cnf"
     } else {
         from "${rootProject.projectDir}/mysql-5_7/Dockerfile"
+        from "${rootProject.projectDir}/mysql-5_7/my.cnf"
     }
 
     from "${rootProject.projectDir}/1_initial_users.sql"
