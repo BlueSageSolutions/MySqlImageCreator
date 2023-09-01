@@ -94,8 +94,6 @@ CREATE USER 'bluedlp_dev'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'bluedlp_dev'@'%';
 CREATE USER 'bluedlp_lower_admin'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'bluedlp_lower_admin'@'%';
-CREATE USER 'bss_developers'@'%' IDENTIFIED BY 'waoij5oi34ejel';
-GRANT ALL PRIVILEGES ON *.* TO 'bss_developers'@'%';
 CREATE USER 'dlp_fly'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'dlp_fly'@'%';
 FLUSH PRIVILEGES;
