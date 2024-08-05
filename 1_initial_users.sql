@@ -96,6 +96,10 @@ CREATE USER 'bluedlp_lower_admin'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'bluedlp_lower_admin'@'%';
 CREATE USER 'dlp_fly'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'dlp_fly'@'%';
+CREATE USER 'rcu_fly'@'%' IDENTIFIED BY 'waoij5oi34ejel';
+GRANT ALL PRIVILEGES ON *.* TO 'rcu_fly'@'%';
+CREATE USER 'mbi_fly'@'%' IDENTIFIED BY 'waoij5oi34ejel';
+GRANT ALL PRIVILEGES ON *.* TO 'mbi_fly'@'%';
 FLUSH PRIVILEGES;
 
 SET GLOBAL log_bin_trust_function_creators = 1;
