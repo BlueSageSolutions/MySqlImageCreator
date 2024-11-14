@@ -100,6 +100,9 @@ CREATE USER 'rcu_fly'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'rcu_fly'@'%';
 CREATE USER 'mbi_fly'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'mbi_fly'@'%';
+CREATE USER 'servicing_lower_admin'@'%' IDENTIFIED BY 'waoij5oi34ejel';
+GRANT ALL PRIVILEGES ON *.* TO 'servicing_lower_admin'@'%';
+
 FLUSH PRIVILEGES;
 
 SET GLOBAL log_bin_trust_function_creators = 1;
