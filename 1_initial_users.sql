@@ -104,6 +104,9 @@ CREATE USER 'servicing_lower_admin'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'servicing_lower_admin'@'%';
 CREATE USER 'svc_fly'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'svc_fly'@'%';
+CREATE USER 'bss_fly'@'%' IDENTIFIED BY 'waoij5oi34ejel';
+GRANT ALL PRIVILEGES ON *.* TO 'bss_fly'@'%';
+
 FLUSH PRIVILEGES;
 
 SET GLOBAL log_bin_trust_function_creators = 1;
