@@ -22,6 +22,8 @@ CREATE USER 'kindretail_admin'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'kindretail_admin'@'%';
 CREATE USER 'lendage_lwr_adm'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'lendage_lwr_adm'@'%';
+CREATE USER 'lendage_dev'@'%' IDENTIFIED BY 'waoij5oi34ejel';
+GRANT ALL PRIVILEGES ON *.* TO 'lendage_dev'@'%';
 CREATE USER 'mfm_lower_admin'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'mfm_lower_admin'@'%';
 CREATE USER 'mfmcorr_lwr_adm'@'%' IDENTIFIED BY 'waoij5oi34ejel';
