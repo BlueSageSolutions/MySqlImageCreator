@@ -108,6 +108,8 @@ CREATE USER 'svc_fly'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'svc_fly'@'%';
 CREATE USER 'bss_fly'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'bss_fly'@'%';
+CREATE USER 'internal_mfeldberg_admin'@'%' IDENTIFIED BY 'waoij5oi34ejel';
+GRANT ALL PRIVILEGES ON *.* TO 'internal_mfeldberg_admin'@'%';
 
 FLUSH PRIVILEGES;
 
