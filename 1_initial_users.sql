@@ -110,6 +110,8 @@ CREATE USER 'bss_fly'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'bss_fly'@'%';
 CREATE USER 'internal_mfeldberg_admin'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'internal_mfeldberg_admin'@'%';
+CREATE USER 'mbi_lower_admin'@'%' IDENTIFIED BY 'waoij5oi34ejel';
+GRANT ALL PRIVILEGES ON *.* TO 'mbi_lower_admin'@'%';
 CREATE ROLE ro_role;
 FLUSH PRIVILEGES;
 
