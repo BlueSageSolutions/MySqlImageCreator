@@ -112,6 +112,8 @@ CREATE USER 'internal_mfeldberg_admin'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'internal_mfeldberg_admin'@'%';
 CREATE USER 'mbi_lower_admin'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'mbi_lower_admin'@'%';
+CREATE USER 'move'@'%' IDENTIFIED BY 'waoij5oi34ejel';
+GRANT ALL PRIVILEGES ON *.* TO 'move'@'%';
 CREATE ROLE ro_role;
 FLUSH PRIVILEGES;
 
