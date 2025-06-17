@@ -116,8 +116,6 @@ CREATE USER 'move'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'move'@'%';
 CREATE USER 'allcu'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'allcu'@'%';
-CREATE USER 'dlp_fly'@'%' IDENTIFIED BY 'waoij5oi34ejel';
-GRANT ALL PRIVILEGES ON *.* TO 'dlp_fly'@'%';
 CREATE ROLE ro_role;
 FLUSH PRIVILEGES;
 
