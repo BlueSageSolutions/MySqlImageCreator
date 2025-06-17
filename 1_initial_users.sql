@@ -114,6 +114,8 @@ CREATE USER 'mbi_lower_admin'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'mbi_lower_admin'@'%';
 CREATE USER 'move'@'%' IDENTIFIED BY 'waoij5oi34ejel';
 GRANT ALL PRIVILEGES ON *.* TO 'move'@'%';
+CREATE USER 'allcu'@'%' IDENTIFIED BY 'waoij5oi34ejel';
+GRANT ALL PRIVILEGES ON *.* TO 'allcu'@'%';
 CREATE ROLE ro_role;
 FLUSH PRIVILEGES;
 
